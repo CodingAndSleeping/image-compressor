@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import { inject, ref, useTemplateRef } from 'vue';
 import type { ImageState, TargetType } from '../../types';
-import { compressImage, formatBytes } from '../../utils';
+import { compressImage } from '../../utils';
 import { ElMessage } from 'element-plus';
 
 const { changeOriginImage, changeCompressedImage } =
