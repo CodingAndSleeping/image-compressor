@@ -31,7 +31,7 @@ provide<ImageState>('image-state', {
 </script>
 <style scoped lang="scss">
 .image-compressor {
-  padding-top: 5rem;
+  padding-top: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -52,6 +52,30 @@
           :step="0.1"
         ></el-slider>
       </div>
+
+      <div class="upload-image__option__item">
+        <span>目标格式:</span>
+        <el-select
+          class="target-type-select"
+          v-model="targetType"
+          placeholder="请选择目标格式"
+        >
+          <el-option label="JPEG" value="jpeg"></el-option>
+          <el-option label="PNG" value="png"></el-option>
+          <el-option label="WebP" value="webp"></el-option>
+        </el-select>
+
+        <div class="tooltip">
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="若选择目标格式为PNG，则原图片格式也必须为PNG"
+            placement="top-start"
+          >
+            <el-icon><InfoFilled /></el-icon>
+          </el-tooltip>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -76,9 +100,7 @@ const handleFileChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
     const file = input.files[0];
-    changeOriginImage(file);
-    const newFile = await compressImage(file, quality.value, targetType.value);
-    changeCompressedImage(newFile);
+    await updateFile(file);
     input.value = '';
   }
 };
@@ -94,17 +116,14 @@ const handlePaste = async (event: ClipboardEvent) => {
   const file = item.getAsFile();
   if (!file) return;
   changeOriginImage(file);
-  const newFile = await compressImage(file, quality.value, targetType.value);
-  changeCompressedImage(newFile);
+  await updateFile(file);
 };
 
 const handleDrop = async (event: DragEvent) => {
   if (!event.dataTransfer) return;
   const file = event.dataTransfer.files[0];
   if (!file) return;
-  changeOriginImage(file);
-  const newFile = await compressImage(file, quality.value, targetType.value);
-  changeCompressedImage(newFile);
+  await updateFile(file);
 };
 
 const handleCompress = async () => {
@@ -113,17 +132,24 @@ const handleCompress = async () => {
     .then((res) => res.blob())
     .then(async (blob) => {
       const file = new File([blob], 'remote-image', { type: blob.type });
-      changeOriginImage(file);
-      const newFile = await compressImage(
-        file,
-        quality.value,
-        targetType.value,
-      );
-      changeCompressedImage(newFile);
+      await updateFile(file);
     })
     .catch((err) => {
       ElMessage.error('加载图片失败: ' + err.message);
     });
+};
+
+// 提取压缩图片和修改状态的代码
+const updateFile = async (file: File) => {
+  const newFile = await compressImage(
+    file,
+    quality.value,
+    targetType.value,
+  ).catch((err) => {
+    ElMessage.error((err as Error).message);
+  });
+  newFile && changeOriginImage(file);
+  newFile && changeCompressedImage(newFile);
 };
 </script>
 <style scoped lang="scss">
@@ -173,13 +199,16 @@ const handleCompress = async () => {
         width: fit-content;
         margin-right: 1rem;
       }
-      display: flex;
       .quality-slider {
         width: 10rem;
       }
       .target-type-select {
         width: 10rem;
       }
+    }
+
+    .tooltip {
+      margin-left: 1rem;
     }
   }
 }

@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 
-export type TargetType = 'jpeg' | 'png';
+export type TargetType = 'jpeg' | 'png' | 'webp';
 
 export type ImageState = {
   originImage: Ref<File | null>;

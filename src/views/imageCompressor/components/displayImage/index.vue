@@ -2,17 +2,26 @@
   <div class="display-image">
     <div class="display-image__content">
       <div class="display-image__origin" v-if="originImage">
-        <img :src="originImageUrl" alt="原始图片" />
+        <el-image
+          class="display-image__origin-img"
+          :preview-src-list="previewUrlList"
+          :src="originImageUrl"
+          fit="contain"
+        />
         <span>原始图片: {{ formatBytes(originImage.size) }}</span>
       </div>
       <div class="display-image__compressed" v-if="compressedImage">
-        <img :src="compressedImageUrl" alt="压缩后图片" />
+        <el-image
+          class="display-image__compressed-img"
+          :preview-src-list="previewUrlList"
+          :src="compressedImageUrl"
+          fit="contain"
+        />
         <span>压缩后图片: {{ formatBytes(compressedImage.size) }}</span>
       </div>
     </div>
     <div class="display-image__actions" v-if="compressedImage">
-      <el-button @click="handleDownload">下载图片</el-button>
-      <el-button @click="handleCopy">复制图片</el-button>
+      <el-button @click="handleDownload">下载压缩图片</el-button>
     </div>
   </div>
 </template>
@@ -36,29 +45,14 @@ const handleDownload = () => {
   if (!compressedImage.value) return ElMessage.error('下载失败!');
   const a = document.createElement('a');
   a.href = compressedImageUrl.value;
-  a.download = 'compressed.jpg';
+  a.download = compressedImage.value.name;
   a.click();
+  a.remove();
 };
-const handleCopy = async () => {
-  if (!compressedImage.value) return ElMessage.error('复制失败!');
-  try {
-    // await navigator.clipboard.write([
-    //   new ClipboardItem({
-    //     [compressedImage.value.type]: compressedImage.value,
-    //   }),
-    // ]);
-    const renamedBlob = new Blob([await compressedImage.value.arrayBuffer()], {
-      type: 'image/png', // 此处故意写为 PNG
-    });
-    console.log(formatBytes(renamedBlob.size));
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'image/png': renamedBlob }), // 以 PNG 名义写入
-    ]);
-    ElMessage.success('图片已复制到剪贴板!');
-  } catch (err: unknown) {
-    ElMessage.error('复制失败: ' + (err as Error).message);
-  }
-};
+
+const previewUrlList = computed(() => {
+  return [originImageUrl.value, compressedImageUrl.value];
+});
 </script>
 <style scoped lang="scss">
 .display-image {
@@ -70,10 +64,10 @@ const handleCopy = async () => {
   align-items: center;
 
   .display-image__content {
+    width: 60rem;
     display: flex;
     align-items: center;
-    justify-content: center;
-
+    justify-content: space-around;
     margin-bottom: 2rem;
 
     .display-image__origin,
@@ -83,12 +77,16 @@ const handleCopy = async () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-
-      img {
-        height: 20rem;
-        object-fit: contain;
-        margin-bottom: 1rem;
+      span {
+        margin-top: 1rem;
       }
+    }
+
+    .display-image__origin-img,
+    .display-image__compressed-img {
+      height: 30rem;
+      width: 30rem;
+      border: 1px solid #ccc;
     }
   }
 }
