@@ -5,7 +5,9 @@
         <el-image
           class="display-image__origin-img"
           :preview-src-list="previewUrlList"
+          :initial-index="0"
           :src="originImageUrl"
+          :infinite="true"
           fit="contain"
         />
         <span>原始图片: {{ formatBytes(originImage.size) }}</span>
@@ -14,7 +16,9 @@
         <el-image
           class="display-image__compressed-img"
           :preview-src-list="previewUrlList"
+          :initial-index="1"
           :src="compressedImageUrl"
+          :infinite="true"
           fit="contain"
         />
         <span>压缩后图片: {{ formatBytes(compressedImage.size) }}</span>
