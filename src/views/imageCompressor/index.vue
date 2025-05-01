@@ -1,5 +1,6 @@
 <template>
   <div class="image-compressor">
+    <div class="github" @click="openGithub">github</div>
     <UploadImage />
     <DisplayImage />
   </div>
@@ -28,6 +29,10 @@ provide<ImageState>('image-state', {
   changeOriginImage,
   changeCompressedImage,
 });
+
+const openGithub = () => {
+  window.open('https://github.com/CodingAndSleeping/image-compressor');
+};
 </script>
 <style scoped lang="scss">
 .image-compressor {
@@ -35,5 +40,15 @@ provide<ImageState>('image-state', {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .github {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    cursor: pointer;
+  }
+  .github:hover {
+    text-decoration: underline;
+  }
 }
 </style>
