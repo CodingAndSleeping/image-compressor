@@ -34,34 +34,30 @@ export async function compressImage(
     } else {
       const img = new Image();
       const imgUrl = URL.createObjectURL(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
 
-          if (!ctx) return reject(new Error('Failed to get canvas context'));
-          ctx.drawImage(img, 0, 0);
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
 
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) return reject(new Error('Failed to compress image'));
-              const newFile = new File([blob], 'compressed.' + targetType, {
-                type: `image/${targetType}`,
-              });
-              resolve(newFile.size < file.size ? newFile : file);
-            },
-            `image/${targetType}`,
-            quality,
-          );
-        };
+        if (!ctx) return reject(new Error('Failed to get canvas context'));
+        ctx.drawImage(img, 0, 0);
 
-        img.src = imgUrl;
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return reject(new Error('Failed to compress image'));
+            const newFile = new File([blob], 'compressed.' + targetType, {
+              type: `image/${targetType}`,
+            });
+            resolve(newFile.size < file.size ? newFile : file);
+          },
+          `image/${targetType}`,
+          quality,
+        );
       };
 
-      reader.readAsDataURL(file);
+      img.src = imgUrl;
     }
   });
 }
